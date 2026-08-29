@@ -1,0 +1,76 @@
+---
+# create a configmap, 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: podinfo
+  namespace: geekshacking
+data:
+  PODINFO_UI_MESSAGE: 'hello, world!'
+
+---
+# create a configmap, 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: podinfo
+  namespace: geekshacking
+type: Opaque
+data:
+  # #ffff000
+  PODINFO_UI_COLOR: I0ZGRkYwMA==
+
+---
+# create a deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podinfo
+  namespace: geekshacking
+spec:
+  replicas: 2
+  # pods with these labels belong to me
+  selector:
+    matchLabels:
+      env: workshop
+      dept: eng
+  template:
+    metadata:
+      labels:
+        env: workshop
+        dept: eng
+    spec:
+      containers:
+      - name: podinfo-container
+        image: stefanprodan/podinfo:6.14.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9898
+        env:
+        - name: PODINFO_UI_MESSAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['dept']
+
+        envFrom:
+        - secretRef:
+            name: podinfo
+        # - configMapRef:
+        #     name: podinfo # cm podinfo
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podinfo
+  namespace: geekshacking
+spec:
+  type: LoadBalancer
+  selector:
+    env: workshop
+    dept: eng
+  ports:
+  - port: 80
+    # containerport
+    targetPort: 9898

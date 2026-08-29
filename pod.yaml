@@ -1,11 +1,23 @@
+# ---
+# # imperative command 
+# # kubectl create ns workshop
+# # create a namespace
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: geekshacking
+#   labels:
+#     env: workshop
+
 ---
-# create a namespace
+# create a configmap, 
 apiVersion: v1
-kind: Namespace
+kind: ConfigMap
 metadata:
-  name: geekshacking
-  labels:
-    env: workshop
+  name: podinfo
+  namespace: geekshacking
+data:
+  PODINFO_UI_MESSAGE: 'hello, world!'
 
 ---
 # create a pod, give it a name, add the geekshacking namespace
@@ -24,3 +36,6 @@ spec:
     imagePullPolicy: IfNotPresent
     ports:
     - containerPort: 9898
+    envFrom:
+    - configMapRef:
+        name: podinfo # cm podinfo
