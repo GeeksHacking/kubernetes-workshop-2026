@@ -1,0 +1,26 @@
+---
+# create a namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: geekshacking
+  labels:
+    env: workshop
+
+---
+# create a pod, give it a name, add the geekshacking namespace
+# add some labels
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podinfo
+  namespace: geekshacking
+  labels:
+    env: worksho8
+spec:
+  containers:
+  - name: podinfo-container
+    image: stefanprodan/podinfo:6.14.1
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 9898
